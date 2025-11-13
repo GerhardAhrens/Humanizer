@@ -1,9 +1,0 @@
-# Humanizer
-
-![NET](https://img.shields.io/badge/NET-8.0-green.svg)
-![License](https://img.shields.io/badge/License-MIT-blue.svg)
-![VS](https://img.shields.io/badge/Visual%20Studio-2022-white.svg)
-![Version](https://img.shields.io/badge/Version-1.0.2025.0-yellow.svg)]
-
-Die Klasse konvertiert Texte/String in verschiedene Case-Formate. Weiter können Texte als Template für Singular und Plural zur Ausgabe festgelet werden.
-
