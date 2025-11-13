@@ -55,6 +55,7 @@ namespace Humanizer
         {
             MConsole.Clear();
 
+            //! Beispiel mit 2 Segmenten und 3 Teilen pro Segment
             string aa1 = Humanizer.Message("Bereit: [kein/ein/{0}] - [Datensatz/Datensatz/Datensätze]", 0);
             MConsole.WriteInfoLine(aa1);
             string aa2 = Humanizer.Message("Bereit: [kein/ein/{0}] - [Datensatz/Datensatz/Datensätze]", 1);
@@ -248,6 +249,9 @@ namespace Humanizer
         }
     }
 
+    /// <summary>
+    /// Die Klasse stellt verschiedene Methoden zur Humanisierung von Texten und Zahlen bereit.
+    /// </summary>
     public static class Humanizer
     {
         public static string Message(string msg, int count)
