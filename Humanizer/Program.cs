@@ -325,9 +325,9 @@ namespace Humanizer
             else if (humanizeCase == HumanizeCase.CamelCase)
             {
                 TextInfo textInfo = new CultureInfo("de-DE").TextInfo;
-                string titleCase = textInfo.ToTitleCase(msg.Replace("_", " ").ToLower());
+                string titleCase = textInfo.ToTitleCase(msg.Replace("_", " ").ToLower(CultureInfo.CurrentCulture));
                 char[] camelCase = textInfo.ToTitleCase(titleCase).Replace(" ", string.Empty).ToCharArray();
-                camelCase[0] = char.ToLower(camelCase[0]);
+                camelCase[0] = char.ToLower(camelCase[0], CultureInfo.CurrentCulture);
                 return new string(camelCase);
             }
             else if (humanizeCase == HumanizeCase.SnakeCase)
@@ -376,12 +376,13 @@ namespace Humanizer
             Regex lowerCaseNextToNumber = new Regex("(?<=[0-9])[a-z]");
             Regex upperCaseInside = new Regex("(?<=[A-Z])[A-Z]+?((?=[A-Z][a-z])|(?=[0-9]))");
 
+            char[] separator = new char[] { '_' };
             var pascalCase = invalidCharsRgx.Replace(whiteSpace.Replace(original, "_"), string.Empty)
-                .Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(w => startsWithLowerCaseChar.Replace(w, m => m.Value.ToUpper()))
-                .Select(w => firstCharFollowedByUpperCasesOnly.Replace(w, m => m.Value.ToLower()))
-                .Select(w => lowerCaseNextToNumber.Replace(w, m => m.Value.ToUpper()))
-                .Select(w => upperCaseInside.Replace(w, m => m.Value.ToLower()));
+                .Split(separator, StringSplitOptions.RemoveEmptyEntries)
+                .Select(w => startsWithLowerCaseChar.Replace(w, m => m.Value.ToUpper(CultureInfo.CurrentCulture)))
+                .Select(w => firstCharFollowedByUpperCasesOnly.Replace(w, m => m.Value.ToLower(CultureInfo.CurrentCulture)))
+                .Select(w => lowerCaseNextToNumber.Replace(w, m => m.Value.ToUpper(CultureInfo.CurrentCulture)))
+                .Select(w => upperCaseInside.Replace(w, m => m.Value.ToLower(CultureInfo.CurrentCulture)));
 
             return string.Concat(pascalCase);
         }
@@ -394,7 +395,7 @@ namespace Humanizer
             }
 
             TextInfo cultureInfo = new CultureInfo("de-DE").TextInfo;
-            return cultureInfo.ToTitleCase(original.Replace("_", " ").ToLower());
+            return cultureInfo.ToTitleCase(original.Replace("_", " ").ToLower(CultureInfo.CurrentCulture));
         }
 
         private static string ToCamelCase(string original)
@@ -405,9 +406,9 @@ namespace Humanizer
             }
 
             TextInfo textInfo = new CultureInfo("de-DE").TextInfo;
-            string titleCase = textInfo.ToTitleCase(original.Replace("_", " ").ToLower());
+            string titleCase = textInfo.ToTitleCase(original.Replace("_", " ").ToLower(CultureInfo.CurrentCulture));
             char[] camelCase = textInfo.ToTitleCase(titleCase).Replace(" ", string.Empty).ToCharArray();
-            camelCase[0] = char.ToLower(camelCase[0]);
+            camelCase[0] = char.ToLower(camelCase[0], CultureInfo.CurrentCulture);
             return new string(camelCase);
         }
 
@@ -452,7 +453,7 @@ namespace Humanizer
                             builder.Append('_');
                         }
 
-                        currentChar = char.ToLower(currentChar, CultureInfo.InvariantCulture);
+                        currentChar = char.ToLower(currentChar, CultureInfo.CurrentCulture);
                         break;
 
                     case UnicodeCategory.LowercaseLetter:
@@ -486,10 +487,10 @@ namespace Humanizer
             }
 
             // finde and ersetze alle Teile, die mit einem Großbuchstaben starten (z.B. Net)
-            original = Regex.Replace(original, "[A-Z][a-z]+", m => $"-{m.ToString().ToLower()}");
+            original = Regex.Replace(original, "[A-Z][a-z]+", m => $"-{m.ToString().ToLower(CultureInfo.CurrentCulture)}");
 
             // finde and ersetze alle Teile, die nur aus Großbuchstaben bestehen (z.B. NET)
-            original = Regex.Replace(original, "[A-Z]+", m => $"-{m.ToString().ToLower()}");
+            original = Regex.Replace(original, "[A-Z]+", m => $"-{m.ToString().ToLower(CultureInfo.CurrentCulture)}");
 
             // Ersetze alle Nicht-Alphanummerischen Zeichen mit einem Dash (z.B. $%)
             original = Regex.Replace(original, @"[^0-9a-zA-Z]", "-");
@@ -501,10 +502,10 @@ namespace Humanizer
             original = Regex.Replace(original, @"-+$", string.Empty);
 
             // Entferne alle Dashes am Anfang
-            if (original.StartsWith("-")) original = original.Substring(1);
+            if (original.StartsWith("-",StringComparison.CurrentCulture)) original = original.Substring(1);
 
             // Lowercase und return
-            return original.ToLower();
+            return original.ToLower(CultureInfo.CurrentCulture);
         }
     }
 
@@ -517,7 +518,7 @@ namespace Humanizer
         TitleCase,
     }
 
-    internal class NumberToWord
+    internal sealed class NumberToWord
     {
         private static readonly string[] Einheiten = { "null", "eins", "zwei", "drei", "vier", "fünf", "sechs", "sieben", "acht", "neun",
           "zehn", "elf", "zwölf", "dreizehn", "vierzehn", "fünfzehn", "sechzehn", "siebzehn", "achtzehn", "neunzehn" };
@@ -604,11 +605,11 @@ namespace Humanizer
                 return text;
             }
 
-            return $"{char.ToUpper(text[0])}{text.Substring(1)}";
+            return $"{char.ToUpper(text[0],CultureInfo.CurrentCulture)}{text.Substring(1)}";
         }
     }
 
-    internal class TimeFormatter
+    internal sealed class TimeFormatter
     {
         internal static string TimeDiffToText(DateTime vergangen)
         {
